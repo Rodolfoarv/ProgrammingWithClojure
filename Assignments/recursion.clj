@@ -101,12 +101,25 @@
 ; 9.- The function my-concat returns the resulting list of appending the two lists it takes as input
 ; Do not use the predifined concat function
 
+(defn my-concat [lst1 lst2]
+  "Returns the reuslting list appending the two lists it takes as input"
+  (loop [result (reverse lst1) list2 lst2]
+    (if (empty? list2)
+      (reverse result)
+      (recur (cons (first list2) result) (rest list2)))))
 
+; 10.- The function deep-reverse takes a list as its input. It returns a list with the same
+;elements as its input but in reverse order. If there are any nested lists the should be reversed
 
-
-
-
-
+(defn deep-reverse [lst]
+  "Returns a list witht he sameelements as its input but in reverse order.
+  If there are any nested lists within, they should be reversed as well"
+  (cond
+    (empty? lst) lst
+    (list? (last lst))
+    (cons (deep-reverse (last lst)) (deep-reverse (butlast lst)))
+    :else
+    (cons (last lst) (deep-reverse (butlast lst)))))
 
 
 
@@ -166,6 +179,12 @@
     (is (= '(a b c) (my-concat '(a b c) ())))
     (is (= '(1 2 3) (my-concat () '(1 2 3))))
     (is (= '(a b c 1 2 3) (my-concat '(a b c) '(1 2 3)))))
+
+; 10.-
+(deftest test-deep-reverse
+  (is (= () (deep-reverse ())))
+  (is (= '(3 (d c b) a) (deep-reverse '(a (b c d) 3))))
+  (is (= '(((6 5) 4) 3 (2 1)) (deep-reverse '((1 2) 3 (4 (5 6)))))))
 
 
 (run-tests) ; Command used to run the tests
