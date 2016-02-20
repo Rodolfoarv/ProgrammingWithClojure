@@ -12,7 +12,7 @@ clojure exercises to demonstrate different concepts used within the language.
     git clone https://github.com/Rodolfoarv/ProgrammingWithClojure.git
 
     # Run application
-    The application is divided within folders. Assignemnts and Simple Exercises.
+    The application is divided within folders. Assignments and Simple Exercises.
     To run any of those execute the following commands on your terminal.
     lein repl
     (load-file <name_of_the_file.clj)
