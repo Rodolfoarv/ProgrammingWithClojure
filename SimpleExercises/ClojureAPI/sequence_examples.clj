@@ -51,8 +51,16 @@
     second))
 
 (defn pack
+  "Returns consecutive repeated elements placed in separate sublists"
   [lst]
   (partition-by identity lst))
+
+(defn compress
+  "Replaces consecutive repeated elements replaced with a single copy"
+  [lst]
+  (->>
+    (pack lst)
+    (map first))) ;3rd parameter is the result of pack
 
 (deftest test-add-list
   (is (= 0 (add-list ())))
@@ -94,5 +102,11 @@
            (pack '(a a a a b c c a a d e e e e))))
     (is (= '((1) (2) (3) (4) (5)) (pack '(1 2 3 4 5))))
     (is (= '((9 9 9 9 9 9 9 9 9)) (pack '(9 9 9 9 9 9 9 9 9)))))
+
+(deftest test-compress
+  (is (= () (compress ())))
+  (is (= '(a b c d) (compress '(a b c d))))
+  (is (= '(a b c a d e) (compress '(a a a a b c c a a d e e e e))))
+  (is (= '(a) (compress '(a a a a a a a a a a)))))
 
 (run-tests)
