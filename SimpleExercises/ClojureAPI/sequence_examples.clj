@@ -50,6 +50,10 @@
     first
     second))
 
+(defn pack
+  [lst]
+  (partition-by identity lst))
+
 (deftest test-add-list
   (is (= 0 (add-list ())))
   (is (= 10 (add-list '(2 4 1 3))))
@@ -83,5 +87,12 @@
   (is (= () (binary 0)))
   (is (= '(1 1 1 1 0) (binary 30)))
   (is (= '(1 0 1 1 0 0 0 0 0 1 0 0 0 0 1 1) (binary 45123))))
+
+  (deftest test-pack
+    (is (= () (pack ())))
+    (is (= '((a a a a) (b) (c c) (a a) (d) (e e e e))
+           (pack '(a a a a b c c a a d e e e e))))
+    (is (= '((1) (2) (3) (4) (5)) (pack '(1 2 3 4 5))))
+    (is (= '((9 9 9 9 9 9 9 9 9)) (pack '(9 9 9 9 9 9 9 9 9)))))
 
 (run-tests)
