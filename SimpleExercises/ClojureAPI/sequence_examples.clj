@@ -62,6 +62,20 @@
     (pack lst)
     (map first))) ;3rd parameter is the result of pack
 
+(defn encode
+  [lst]
+  (->>
+    (pack lst)
+    (map #(vector (count %) (first %)))))
+
+(defn encode-modified
+  [lst]
+    (->>
+      (encode lst)
+      (map (fn [[c,e]] (if (= 1 c) e [c e])))))
+
+
+
 (deftest test-add-list
   (is (= 0 (add-list ())))
   (is (= 10 (add-list '(2 4 1 3))))
@@ -108,5 +122,19 @@
   (is (= '(a b c d) (compress '(a b c d))))
   (is (= '(a b c a d e) (compress '(a a a a b c c a a d e e e e))))
   (is (= '(a) (compress '(a a a a a a a a a a)))))
+
+(deftest test-encode
+  (is (= () (encode ())))
+  (is (= '([4 a] [1 b] [2 c] [2 a] [1 d] [4 e])
+         (encode '(a a a a b c c a a d e e e e))))
+  (is (= '([1 1] [1 2] [1 3] [1 4] [1 5]) (encode '(1 2 3 4 5))))
+  (is (= '([9 9]) (encode '(9 9 9 9 9 9 9 9 9)))))
+
+(deftest test-encode-modified
+    (is (= () (encode-modified ())))
+    (is (= '([4 a] b [2 c] [2 a] d [4 e])
+           (encode-modified '(a a a a b c c a a d e e e e))))
+    (is (= '(1 2 3 4 5) (encode-modified '(1 2 3 4 5))))
+    (is (= '([9 9]) (encode-modified '(9 9 9 9 9 9 9 9 9)))))
 
 (run-tests)
