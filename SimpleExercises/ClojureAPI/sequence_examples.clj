@@ -74,6 +74,10 @@
       (encode lst)
       (map (fn [[c,e]] (if (= 1 c) e [c e])))))
 
+(defn decode
+  [lst]
+  (mapcat (fn [x] (if (vector? x) (repeat (x 0) (x 1)) (list x))) lst))
+
 
 
 (deftest test-add-list
@@ -136,5 +140,12 @@
            (encode-modified '(a a a a b c c a a d e e e e))))
     (is (= '(1 2 3 4 5) (encode-modified '(1 2 3 4 5))))
     (is (= '([9 9]) (encode-modified '(9 9 9 9 9 9 9 9 9)))))
+
+    (deftest test-decode
+      (is (= () (decode ())))
+      (is (= '(a a a a b c c a a d e e e e)
+             (decode '([4 a] b [2 c] [2 a] d [4 e]))))
+      (is (= '(1 2 3 4 5) (decode '(1 2 3 4 5))))
+      (is (= '(9 9 9 9 9 9 9 9 9) (decode '([9 9])))))
 
 (run-tests)
