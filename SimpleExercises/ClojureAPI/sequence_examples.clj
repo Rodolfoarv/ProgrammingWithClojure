@@ -63,18 +63,22 @@
     (map first))) ;3rd parameter is the result of pack
 
 (defn encode
+  "Consecutives elements in a list are encoded as vectors [n,e]"
   [lst]
   (->>
     (pack lst)
     (map #(vector (count %) (first %)))))
 
 (defn encode-modified
+  "Consecutives elements in a list are encoded as vectors [n,e], however
+  if n has no more than 1 it returns the same element"
   [lst]
     (->>
       (encode lst)
       (map (fn [[c,e]] (if (= 1 c) e [c e])))))
 
 (defn decode
+  "Returns the decoded version of lst"
   [lst]
   (mapcat (fn [x] (if (vector? x) (repeat (x 0) (x 1)) (list x))) lst))
 
