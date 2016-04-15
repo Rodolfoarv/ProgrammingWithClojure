@@ -1,3 +1,10 @@
+;;; ITESM CEM, April 14, 2016.
+;;; Clojure Source File
+;;; Activity: Macros
+;;; Authors:
+;;;          A01169701 Rodolfo Andrés Ramírez Valenzuela
+
+
 (ns-name (create-ns 'macros))
 
 ;Write a macro called my-or that works as described above.
@@ -47,12 +54,26 @@
   (let [negated (symbol (str 'not- name))]
    `(do (defn ~name ~args ~@predicates)
         (defn ~negated ~args (not (do ~@predicates))))))
-        ;(defn (symbol (str ~'not- ~name) ~args (not (do ~@predicates))))
 
- ; (do
- ; (clojure.core/defn less-than-one? [x] (< x 1))
- ; (clojure.core/defn
- ;  (clojure.core/symbol
- ;   (clojure.core/str not- less-than-one?)
- ;   [x]
- ;   (clojure.core/not (do (< x 1))))))
+
+;Write a macro called defn-curry, that performs a currying transformation to a function definition.
+; It takes as parameters a name, an args vector, and a body of one or more expressions.
+; The macro should define a function called name that takes only the first argument from args and
+; returns a function that takes the second argument from args and returns a function that takes the third argument
+;  from args, and so on. The last function returned takes the last argument from args
+;  and evaluates all the expressions in body using a do special form (see the test code for examples).
+
+ (defmacro defn-curry
+   ([name args & body]
+    (let [parameter (first args) rest_arg (rest args)]
+      (cond
+        (= 0 (count args)) `(defn ~name []   (do ~@body))
+        (= 1 (count args)) `(defn ~name [~parameter] (do ~@body))
+        :else
+          `(defn ~name [~parameter] (curry_aux ~body ~@rest_arg))))))
+
+ (defmacro curry_aux
+   ([body parameter]
+    `(fn [~parameter] (do ~@body)))
+   ([body parameter & rest]
+    `(fn [~parameter] (curry_aux ~body ~@rest))))
