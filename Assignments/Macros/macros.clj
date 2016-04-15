@@ -34,8 +34,9 @@
   `(loop []
     (if-not ~condition
       (do
-        ~@lst)
-          (recur))))
+        ~@lst
+        (recur))
+        nil)))
 
 (defmacro do-loop
   [x & y]
