@@ -19,3 +19,6 @@
 
 (with-db simpsons (run* [q] (fathero :homer q)))
 (with-db simpsons (run* [q] (fathero q :lisa)))
+
+;Combined with-db and run*
+(run-db* simpsons [q1 q2] (fathero q1 q2))
