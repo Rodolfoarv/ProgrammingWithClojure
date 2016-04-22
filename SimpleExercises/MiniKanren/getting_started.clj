@@ -85,3 +85,23 @@
     [(fresh [h t]
       (conso h t l)
       (insideo e t))]))
+
+
+;Day 3
+;Introducing finite domains
+
+(require '[clojure.core.logic.fd :as fd])
+
+(run* [q]
+  (fd/in q (fd/interval 0 10))
+  (fd/<= q 1))
+
+(run* [q]
+  (fresh [x y z a]
+    (== q [x y z])
+    (fd/in x y z a (fd/interval 1 100))
+    (fd/distinct [x y z])
+    (fd/< x y)
+    (fd/< y z)
+    (fd/eq
+      (= (+ x y z) 100) )))
