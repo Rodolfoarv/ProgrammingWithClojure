@@ -41,3 +41,30 @@
     (conde
       [(mothero gm m) (mothero m gch)]
       [(mothero gm m) (fathero m gch)])))
+
+(defn grand-fathero
+  [gf gch]
+  (fresh [f]
+    (conde
+      [(fathero gf f) (mothero f gch)]
+      [(fathero gf f) (fathero f gch)])))
+
+(run-db* simpsons [q] (grand-fathero q :bart))
+(run-db* simpsons [q] (grand-fathero :clancy q))
+
+(defn marriedo
+  [h w]
+  (fresh [ch]
+    (mothero w ch) (fathero h ch)))
+
+(run-db* simpsons [q] (marriedo :homer :marge))
+
+(defn siblingo
+  [p1 p2]
+  (fresh [x]
+    (!= p1 p2)
+    (conda
+      [(mothero x p1) (mothero x p2)]
+      [(fathero x p1) (mothero x p2)])))
+
+(run-db* simpsons [q1 q2] (siblingo q1 q2))
