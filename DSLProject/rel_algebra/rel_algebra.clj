@@ -7,7 +7,7 @@
 
 (defn read-csv-keys
   [file-name]
-  (map #(keyword %) (str/split (first (read-csv file-name)) #",")))
+  (into [] (map #(keyword %) (str/split (first (read-csv file-name)) #","))))
 
 (defn read-csv-values
   [file-name]
@@ -61,10 +61,12 @@
 ; :ok
 
 (defmulti make-instance (fn [class & rest] class))
-(defmacro defrecord* [record-name fields]
+(defmacro defrecord* [record-name & fields]
   `(do
-    (defrecord ~record-name ~fields)
+    (defrecord ~record-name ~(vec fields))
     (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
       (new ~record-name ~@fields))))
-(defrecord* Person [name age])
-(def f1 (make-instance 'Person :age 99 :name "bob"))
+
+(defrecord* Person name age)
+(def s (Person. "rodolfo" 23))
+(def a (make-instance 'Person :age 99 :name "bob"))
