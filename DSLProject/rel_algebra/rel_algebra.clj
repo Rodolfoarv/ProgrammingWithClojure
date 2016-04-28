@@ -1,21 +1,14 @@
 (require '[clojure.string :as str])
 
-(defmulti make-instance (fn [class & rest] class))
-(defmacro defrecord* [record-name fields]
-  `(do
-    (defrecord ~record-name ~fields)
-    (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
-      (new ~record-name ~@fields))))
+; (defmulti make-instance (fn [class & rest] class))
+; (defmacro defrecord* [record-name fields]
+;   `(do
+;     (defrecord ~record-name ~@fields)
+;     (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
+;       (new ~record-name ~@fields))))
 
-(defmacro create-relation
-  [name keys values]
-  `(do
-    (defentity name keys)
-    (make-instance name )
-
-
-; (defentity Person [name age])
-; (make-instance 'Person :age 22 :name "Rodolfo")
+(defmacro defentity [name & values]
+  `(defrecord ~name ~@values))
 
 (defn read-csv
   "Function that returns a vector with the contents of the csv"
@@ -25,7 +18,7 @@
 (defn read-csv-keys
   "Function that returns the keys of a csv that will be mapped"
   [file-name]
-  (into [] (map #(symbol %) (str/split (first (read-csv file-name)) #","))))
+  (map #(keyword %) (str/split (first (read-csv file-name)) #",")))
 
 (defn read-csv-values
   "Function that returns the tuples of a csv that will be mapped"
@@ -52,12 +45,10 @@
   (when (not condition)
     (throw (IllegalArgumentException. error-message))))
 
-(defn create-relation
-  [name keys value]
-  ; (defrecord* name keys))
-  nil)
 
-
+(defn length-array
+  [key dbrelation]
+  (count (last (sort-by count (map #(str (get % key)) dbrelation)))))
 
 (defn str-relation
   [relation]
@@ -68,19 +59,25 @@
   (let [
         keys (read-csv-keys (.file-name relation))
         values (read-csv-values (.file-name relation))
-        dbrelation (map (fn [value] (create-relation (symbol (.file-name relation)) keys value)) values)]
-        (print keys)))
+        dbrelation (map (fn [value] (create-tuple keys value)) values)
+        strlength (map (fn [key] (length-array key dbrelation)) keys)
+        ]
+        (pprint dbrelation)))
 
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
 
 (defn relation
-  "Factory function for creating instances of Rectangle."
+  "Factory function for creating instances of Relation."
   [file-name]
   (->Relation file-name))
 
 (str (relation "students1"))
-(defrecord* Student [name age])
-(def s1 (Student. "Rodolfo" 22))
+; (defrecord* Student [name age])
+; (def s1 (Student. "Rodolfo" 22))
+
 
 ;Whats student? keyword?
 ;define a new macro to create a new tuple?
+
+; (macroexpand-1 (defrecord* Person [name age]))
+; (Person. "Rodolfo" 21)
