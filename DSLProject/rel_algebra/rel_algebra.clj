@@ -1,15 +1,21 @@
 (require '[clojure.string :as str])
 
 (defmulti make-instance (fn [class & rest] class))
-(defmacro defrecord* [record-name & fields]
+(defmacro defrecord* [record-name fields]
   `(do
-    (defrecord ~record-name ~(vec fields))
+    (defrecord ~record-name ~fields)
     (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
       (new ~record-name ~@fields))))
 
-(defrecord* Person name age)
-(def s (Person. "rodolfo" 23))
-(def a (make-instance 'Person :age 99 :name "bob"))
+(defmacro create-relation
+  [name keys values]
+  `(do
+    (defentity name keys)
+    (make-instance name )
+
+
+; (defentity Person [name age])
+; (make-instance 'Person :age 22 :name "Rodolfo")
 
 (defn read-csv
   "Function that returns a vector with the contents of the csv"
@@ -46,6 +52,13 @@
   (when (not condition)
     (throw (IllegalArgumentException. error-message))))
 
+(defn create-relation
+  [name keys value]
+  ; (defrecord* name keys))
+  nil)
+
+
+
 (defn str-relation
   [relation]
   (check-argument
@@ -55,7 +68,7 @@
   (let [
         keys (read-csv-keys (.file-name relation))
         values (read-csv-values (.file-name relation))
-        ]
+        dbrelation (map (fn [value] (create-relation (symbol (.file-name relation)) keys value)) values)]
         (print keys)))
 
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
@@ -66,3 +79,8 @@
   (->Relation file-name))
 
 (str (relation "students1"))
+(defrecord* Student [name age])
+(def s1 (Student. "Rodolfo" 22))
+
+;Whats student? keyword?
+;define a new macro to create a new tuple?
