@@ -55,9 +55,8 @@
   (let [
         keys (read-csv-keys (.file-name relation))
         values (read-csv-values (.file-name relation))
-
-        largest (largest-values keys values)]
-        (print largest)))
+        ]
+        (print keys)))
 
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
 
@@ -65,3 +64,5 @@
   "Factory function for creating instances of Rectangle."
   [file-name]
   (->Relation file-name))
+
+(str (relation "students1"))
