@@ -1,15 +1,28 @@
 (require '[clojure.string :as str])
 
+(defmulti make-instance (fn [class & rest] class))
+(defmacro defrecord* [record-name & fields]
+  `(do
+    (defrecord ~record-name ~(vec fields))
+    (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
+      (new ~record-name ~@fields))))
+
+(defrecord* Person name age)
+(def s (Person. "rodolfo" 23))
+(def a (make-instance 'Person :age 99 :name "bob"))
+
 (defn read-csv
   "Function that returns a vector with the contents of the csv"
   [file-name]
   (str/split-lines (slurp (str (name file-name) ".csv"))))
 
 (defn read-csv-keys
+  "Function that returns the keys of a csv that will be mapped"
   [file-name]
-  (into [] (map #(keyword %) (str/split (first (read-csv file-name)) #","))))
+  (into [] (map #(symbol %) (str/split (first (read-csv file-name)) #","))))
 
 (defn read-csv-values
+  "Function that returns the tuples of a csv that will be mapped"
   [file-name]
   (rest (read-csv file-name)))
 
@@ -33,11 +46,6 @@
   (when (not condition)
     (throw (IllegalArgumentException. error-message))))
 
-(defn largest-values
-  [keys values]
-  (count (first values)))
-
-
 (defn str-relation
   [relation]
   (check-argument
@@ -47,6 +55,7 @@
   (let [
         keys (read-csv-keys (.file-name relation))
         values (read-csv-values (.file-name relation))
+
         largest (largest-values keys values)]
         (print largest)))
 
@@ -56,17 +65,3 @@
   "Factory function for creating instances of Rectangle."
   [file-name]
   (->Relation file-name))
-
-(str (relation :students1))
-; :ok
-
-(defmulti make-instance (fn [class & rest] class))
-(defmacro defrecord* [record-name & fields]
-  `(do
-    (defrecord ~record-name ~(vec fields))
-    (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
-      (new ~record-name ~@fields))))
-
-(defrecord* Person name age)
-(def s (Person. "rodolfo" 23))
-(def a (make-instance 'Person :age 99 :name "bob"))
