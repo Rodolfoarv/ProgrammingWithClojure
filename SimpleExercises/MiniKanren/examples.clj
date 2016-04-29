@@ -41,8 +41,6 @@
       (reverseo t x)
       (appendo x [h] result))))
 
-
-
 ; First implementation of dup
 
 (defn dup
@@ -53,12 +51,20 @@
 
 ;Logic function
 
-(defn dupo
+; (defn dupo
+;   [lst result]
+;   (conde
+;     [(== lst []) (== result [])]
+;     [(!= lst [])
+;       (fresh [h t x]
+;         (conso h t lst)
+;         (dupo t x)
+;         (appendo [h h] x result))]))
+
+(defne dupo
   [lst result]
-  (conde
-    [(== lst []) (== result [])]
-    [(!= lst [])
-      (fresh [h t x]
-        (conso h t lst)
-        (dupo t x)
-        (appendo [h h] x result))]))
+  ([[] []])
+  ([[h . t] result]
+    (fresh [x]
+      (dupo t x)
+      (appendo [h h] x result))))
