@@ -32,7 +32,7 @@
     (apply assoc {} (interleave keys values))))
 
 (defrecord Relation
-  [file-name]
+  [keys tuples]
   Object
   (toString [this]
     (declare str-relation) ; str-relation is declared later.
@@ -113,11 +113,10 @@
    (str "Parameter 'relation' must be an instance of Relation, not "
         (class relation)))
   (let [
-        keys (read-csv-keys (.file-name relation))
-        values (read-csv-values (.file-name relation))
+        keys (.keys relation)
+        values (.tuples relation)
         dbrelation (map (fn [value] (create-tuple keys value)) values)
         strlength (map (fn [key] (length-array key dbrelation)) keys)
-        result '(str)
         ]
         (str
           (print-line strlength)
@@ -127,14 +126,29 @@
           (print-footer strlength))
         ))
 
-
-
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
 
 (defn relation
   "Factory function for creating instances of Relation."
   [file-name]
-  (->Relation file-name))
+
+  (check-argument
+   (keyword? file-name)
+   (str "Parameter 'file-name' must be a keyword. "
+        "Value given: "
+        file-name))
+
+  (let [keys (read-csv-keys file-name)
+        tuples (read-csv-values file-name)]
+
+  (->Relation keys tuples)))
+
+
+(defn union
+    [r1 r2]
+    nil
+  )
+
 
 (def s1 (relation :students1))
 (println (str s1))
