@@ -63,15 +63,44 @@
   (+ 2 (max (count (name key)) (count (last (sort-by count (map #(str (get % key)) dbrelation)))))))
 
 (defn print-keys
-  [keys strlength]
-  (map #() strlength)
-  (format "+"))
+  [strlength keys]
+  (str "|"
+  (str/join '|
+    (map (fn [length key]
+            (let [newlength (dec length)
+                  splicestr (str " %-" (str newlength) "s") ]
 
-(defn print-header
+            (format splicestr (name key))))
+             strlength keys)) "|\n"))
+
+(defn print-line
   [strlength]
       (str "+"
       (str/join '+
         (map #(str/join (repeat % '-)) strlength)) "+\n"))
+
+(defn print-footer
+  [strlength]
+  (str "+"
+  (str/join '+
+    (map #(str/join (repeat % '-)) strlength)) "+"))
+
+
+(defn print-tuple
+  [strlength tuple]
+  (let [columns (vals tuple)]
+    (str "|"
+    (str/join '|
+      (map (fn [length value]
+        (if (number? value)
+          (let [newlength (dec length)
+                splicestr (str " %-" (str newlength) "s")]
+          (format splicestr (str value)))
+          ;else
+          (let [newlength (dec length)
+                splicestr (str "%" (str newlength) "s ")]
+          (format splicestr (str value)))))
+           strlength columns)) "|\n")))
 
 
 (defn str-relation
@@ -86,7 +115,15 @@
         dbrelation (map (fn [value] (create-tuple keys value)) values)
         strlength (map (fn [key] (length-array key dbrelation)) keys)
         ]
-        (print-header strlength)))
+        (str
+          (print-line strlength)
+          (print-keys strlength keys)
+          (print-line strlength)
+          (str/join (apply concat (map #(print-tuple strlength % ) dbrelation)))
+          (print-footer strlength)
+        )
+
+        ))
 
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
 
@@ -96,5 +133,5 @@
   (->Relation file-name))
 
 (def s1 (relation :students1))
-(println (str s1))
+; (println (str s1))
 (str s1)
