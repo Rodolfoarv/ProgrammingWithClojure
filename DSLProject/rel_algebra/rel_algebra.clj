@@ -85,6 +85,9 @@
   (str/join '+
     (map #(str/join (repeat % '-)) strlength)) "+"))
 
+(defn parse-int [str]
+  (let [n (read-string str)]
+       (if (number? n) n nil)))
 
 (defn print-tuple
   [strlength tuple]
@@ -92,7 +95,7 @@
     (str "|"
     (str/join '|
       (map (fn [length value]
-        (if (number? value)
+        (if (= nil (parse-int value))
           (let [newlength (dec length)
                 splicestr (str " %-" (str newlength) "s")]
           (format splicestr (str value)))
@@ -114,16 +117,17 @@
         values (read-csv-values (.file-name relation))
         dbrelation (map (fn [value] (create-tuple keys value)) values)
         strlength (map (fn [key] (length-array key dbrelation)) keys)
+        result '(str)
         ]
         (str
           (print-line strlength)
           (print-keys strlength keys)
           (print-line strlength)
           (str/join (apply concat (map #(print-tuple strlength % ) dbrelation)))
-          (print-footer strlength)
-        )
-
+          (print-footer strlength))
         ))
+
+
 
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
 
@@ -133,5 +137,5 @@
   (->Relation file-name))
 
 (def s1 (relation :students1))
-; (println (str s1))
-(str s1)
+(println (str s1))
+; (str s1)
