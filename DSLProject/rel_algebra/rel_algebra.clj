@@ -155,7 +155,23 @@
           (class r1)))
     (->Relation (.keys r1) (distinct (concat (.tuples r1) (.tuples r2)))))
 
+(defn seq-contains?
+  "Determine whether a sequence contains a given item"
+  [sequence item]
+  (if (empty? sequence)
+    false
+    (reduce #(or %1 %2) (map #(= %1 item) sequence))))
 
+(defn difference
+  [r1 r2]
+  (check-argument
+    (= (.keys r1) (.keys r2))
+    (str "relations are not union-compatible (have the same name and same order)." ))
+  (check-argument
+   (and (instance? Relation r1) (instance? Relation r2))
+   (str "Parameter 'relation' must be an instance of Relation, not "
+        (class r1)))
+  (->Relation (.keys r1) (filter #(not (seq-contains? (.tuples r2) %)) (.tuples r1))))
 
 
 
@@ -165,4 +181,5 @@
 (def e (relation :enrollments))
 (println (str s1))
 (println (union s1 s2))
+(println (difference s1 s2))
 :ok
