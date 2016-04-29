@@ -146,6 +146,7 @@
 
 (defn union
     [r1 r2]
+    "Returns a new relation object that contains all the rows in relation-a and relation-b"
     (check-argument
       (= (.keys r1) (.keys r2))
       (str "relations are not union-compatible (have the same name and same order)." ))
@@ -163,6 +164,7 @@
     (reduce #(or %1 %2) (map #(= %1 item) sequence))))
 
 (defn difference
+  "Returns a new relation object that contains the rows in relation-a that are not in relation-b."
   [r1 r2]
   (check-argument
     (= (.keys r1) (.keys r2))
@@ -173,6 +175,21 @@
         (class r1)))
   (->Relation (.keys r1) (filter #(not (seq-contains? (.tuples r2) %)) (.tuples r1))))
 
+(defn intersection
+  "Returns a new relation object that contains the rows in relation-a that are also in relation-b. "
+  [r1 r2]
+  (check-argument
+    (= (.keys r1) (.keys r2))
+    (str "relations are not union-compatible (have the same name and same order)." ))
+  (check-argument
+   (and (instance? Relation r1) (instance? Relation r2))
+   (str "Parameter 'relation' must be an instance of Relation, not "
+        (class r1)))
+  (->Relation (.keys r1) (filter #(seq-contains? (.tuples r2) %) (.tuples r1))))
+
+(defn product
+  "Returns a new relation object that contains the Cartesian product of relation-a times relation-b. "
+  nil)
 
 
 (def s1 (relation :students1))
@@ -181,5 +198,5 @@
 (def e (relation :enrollments))
 (println (str s1))
 (println (union s1 s2))
-(println (difference s1 s2))
+(println (intersection s1 s2))
 :ok
