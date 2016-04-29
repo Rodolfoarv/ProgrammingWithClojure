@@ -3,12 +3,12 @@
 ; (defmulti make-instance (fn [class & rest] class))
 ; (defmacro defrecord* [record-name fields]
 ;   `(do
-;     (defrecord ~record-name ~@fields)
+;     (defrecord ~record-name ~fields)
 ;     (defmethod make-instance (quote ~record-name) [_# & {:keys ~fields}]
 ;       (new ~record-name ~@fields))))
 
-(defmacro defentity [name & values]
-  `(defrecord ~name ~@values))
+; (defmacro defentity [name & values]
+;   `(defrecord ~name ~@values))
 
 (defn read-csv
   "Function that returns a vector with the contents of the csv"
@@ -38,6 +38,18 @@
     (declare str-relation) ; str-relation is declared later.
     (str-relation this)))
 
+;--------------------------------------------------------------------
+;; print-method is used by the REPL to decide how to print
+;; an object of a specific type (in this case Rectangle).
+;; We use here the 'str' function (defined above as 'toString')
+;; to privide a consistent way of printing and converting to
+;; string.
+(defmethod print-method Relation
+  [this w]
+  (print-simple (str this) w))
+
+;--------------------------------------------------------------------
+
 (defn check-argument
   "Check if condition is true. If not, throw an
   IllegalArgumentException with the given error-message."
@@ -48,7 +60,19 @@
 
 (defn length-array
   [key dbrelation]
-  (count (last (sort-by count (map #(str (get % key)) dbrelation)))))
+  (+ 2 (max (count (name key)) (count (last (sort-by count (map #(str (get % key)) dbrelation)))))))
+
+(defn print-keys
+  [keys strlength]
+  (map #() strlength)
+  (format "+"))
+
+(defn print-header
+  [strlength]
+      (str "+"
+      (str/join '+
+        (map #(str/join (repeat % '-)) strlength)) "+\n"))
+
 
 (defn str-relation
   [relation]
@@ -62,7 +86,7 @@
         dbrelation (map (fn [value] (create-tuple keys value)) values)
         strlength (map (fn [key] (length-array key dbrelation)) keys)
         ]
-        (pprint dbrelation)))
+        (print-header strlength)))
 
 ; dbrelation (map (fn [value] (create-tuple keys value)) values)
 
@@ -71,13 +95,6 @@
   [file-name]
   (->Relation file-name))
 
-(str (relation "students1"))
-; (defrecord* Student [name age])
-; (def s1 (Student. "Rodolfo" 22))
-
-
-;Whats student? keyword?
-;define a new macro to create a new tuple?
-
-; (macroexpand-1 (defrecord* Person [name age]))
-; (Person. "Rodolfo" 21)
+(def s1 (relation :students1))
+(println (str s1))
+(str s1)
