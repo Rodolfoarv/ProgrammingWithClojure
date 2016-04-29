@@ -23,15 +23,25 @@
     (!= t [])
     (lasto t result)))
 
-(defn reverseo
+; (defn reverseo
+;   [lst result]
+;   (fresh [h t x ]
+;     (conde
+;       [(== lst []) (== result [])]
+;       [(!= lst [])
+;       (conso h t lst)
+;       (reverseo t x)
+;       (appendo x [h] result)])))
+
+(defne reverseo
   [lst result]
-  (fresh [h t x ]
-    (conde
-      [(== lst []) (== result [])]
-      [(!= lst [])
-      (conso h t lst)
+  ([[] [] ])
+  ([ [ h . t] result]
+    (fresh [x]
       (reverseo t x)
-      (appendo x [h] result)])))
+      (appendo x [h] result))))
+
+
 
 ; First implementation of dup
 
