@@ -146,10 +146,23 @@
 
 (defn union
     [r1 r2]
-    nil
-  )
+    (check-argument
+      (= (.keys r1) (.keys r2))
+      (str "relations are not union-compatible (have the same name and same order)." ))
+    (check-argument
+     (and (instance? Relation r1) (instance? Relation r2))
+     (str "Parameter 'relation' must be an instance of Relation, not "
+          (class r1)))
+    (->Relation (.keys r1) (distinct (concat (.tuples r1) (.tuples r2)))))
+
+
+
 
 
 (def s1 (relation :students1))
+(def s2 (relation :students2))
+(def c (relation :courses))
+(def e (relation :enrollments))
 (println (str s1))
-; (str s1)
+(println (union s1 s2))
+:ok
