@@ -31,3 +31,15 @@
   (cond
     (empty? lst) ()
     (not (empty? lst)) (concat [(first lst) (first lst)] (dup (rest lst)))))
+
+;Logic function
+
+(defn dupo
+  [lst result]
+  (conde
+    [(== lst []) (== result [])]
+    [(!= lst [])
+      (fresh [h t x]
+        (conso h t lst)
+        (dupo t x)
+        (appendo [h h] x result))]))
