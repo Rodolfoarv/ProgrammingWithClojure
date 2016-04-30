@@ -126,8 +126,6 @@
           (print-footer strlength))
         ))
 
-; dbrelation (map (fn [value] (create-tuple keys value)) values)
-
 (defn relation
   "Factory function for creating instances of Relation."
   [file-name]
@@ -187,16 +185,62 @@
         (class r1)))
   (->Relation (.keys r1) (filter #(seq-contains? (.tuples r2) %) (.tuples r1))))
 
+(defn product-aux
+  [val tuples]
+  (let [total_tuples (repeat (count tuples) val)]
+    (map (fn [r1 r2]
+          (str r1 ","r2)) total_tuples tuples)))
+
 (defn product
   "Returns a new relation object that contains the Cartesian product of relation-a times relation-b. "
-  nil)
+  [r1 r2]
+  (check-argument
+   (and (instance? Relation r1) (instance? Relation r2))
+   (str "Parameter 'relation' must be an instance of Relation, not "
+        (class r1)))
+  (if
+    (= (.keys r1) (.keys r2)) (throw (IllegalArgumentException. "attributes in both relations are not distinct"))
+    (let [new_keys (concat (.keys r1) (.keys r2))
+          new_values (flatten (map (fn [val] (product-aux val (.tuples r2))) (.tuples r1)))
+    ]
+      (->Relation new_keys new_values))))
+
+(defn multiple-seq-contains?
+  [seq1 seq2]
+  (let [total_keys (concat seq1 seq2)]
+    (if (> (count total_keys) (count (seq1)))
+      (throw (IllegalArgumentException. "vector contains invalid key")))))
+
+(defn project-aux
+  [tuple keys]
+  (let [select (select-keys tuple keys)
+        vals (str/join "," (vals select))]
+        vals))
+
+(defn project
+  "Returns a new relation object based on relation but only with the columns specified in attribute-vector."
+  [v relation]
+  (cond
+    (not (vector? v)) (throw (IllegalArgumentException. "attribute-vector should be a vector"))
+    (empty? v) (throw (IllegalArgumentException. "attribute-vector is empty"))
+    (not (every? keyword? v)) (throw (IllegalArgumentException. "vector must be composed of keywords"))
+    (not (distinct? v)) (throw (IllegalArgumentException. "vector must be composed of unique keywords"))
+    ; (multiple-seq-contains? v (.keys relation)) (print "h")
+    ; (instance? Relation relation) (throw (IllegalArgumentException. "Not a relation"))
+    :else
+    (let
+      [dbrelation (map (fn [value] (create-tuple (.keys relation) value)) (.tuples relation))
+       new_values   (distinct (flatten (map (fn [tuple] (project-aux tuple v)) dbrelation)))
+      ]
+      (->Relation v new_values))))
 
 
 (def s1 (relation :students1))
 (def s2 (relation :students2))
 (def c (relation :courses))
 (def e (relation :enrollments))
-(println (str s1))
-(println (union s1 s2))
-(println (intersection s1 s2))
+(def p (relation :pizzas))
+; (str (project [:age] s1))
+
+(println (project [:name :age] s1))
 :ok
